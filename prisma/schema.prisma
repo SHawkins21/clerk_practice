@@ -23,7 +23,7 @@ model User{
   name String
   emailId String @unique
   email String @unique
-  stripeCustomerId String?
+  stripeCustomerId String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   images String? 

@@ -2,7 +2,7 @@
 import prisma from "../lib/prisma"
 
 type User = {
-    id: string
+  
     email:string
     name:string
     emailId: string
@@ -11,7 +11,7 @@ type User = {
 
 export const createOrUpdateuser = async (user: User) => {
     const {
-        id,
+ 
         email,
         name,
         emailId,
@@ -21,7 +21,7 @@ export const createOrUpdateuser = async (user: User) => {
     try {
         await prisma.user.upsert({
             where: {
-                id
+                emailId
             }, 
             update: {
                 email,
@@ -30,7 +30,6 @@ export const createOrUpdateuser = async (user: User) => {
                 images: images || ''
             },
             create: {
-                id,
                 email,
                 name,
                 emailId,

@@ -2,6 +2,15 @@ import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { createOrUpdateuser } from '@/actions/_users'
+type User = {
+    email:string
+    name:string
+    emailId: string
+    images: string | undefined
+}
+
+
 
 export async function POST(req: NextRequest) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET
@@ -41,7 +50,7 @@ export async function POST(req: NextRequest) {
     }) as WebhookEvent
   } catch (err) {
     console.error('Error: Could not verify webhook:', err)
-    return new Response('Error: Verification error', {
+    return new NextResponse('Error: Verification error', {
       status: 400,
     })
   }
@@ -50,6 +59,30 @@ export async function POST(req: NextRequest) {
   // For this guide, log payload to console
   const { id } = evt.data
   const eventType = evt.type
+
+if(
+    eventType === 'user.created' || eventType === 'user.updated'
+){
+    console.log('User created or updated')
+    console.log(evt.data.email_addresses[0].email_address + ' ' + evt.data.last_name + ' ' + evt.data.first_name)
+
+    const user: User = { 
+      
+        email: evt.data.email_addresses[0].email_address,
+        name: evt.data.first_name + ' ' + evt.data.last_name,
+        emailId: evt.data.email_addresses[0].id,
+        images: evt.data.image_url || undefined
+    }
+    try { 
+        await createOrUpdateuser(user)
+    } catch (error) {
+        console.log('Error in createOrUpdateuser', error)
+    }
+}
+
+
+
+  
   console.log(`Received webhook with ID ${id} and event type of ${eventType}`)
   console.log('Webhook payload:', body)
 
